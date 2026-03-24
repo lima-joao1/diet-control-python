@@ -1,5 +1,3 @@
-
-
 class UserArchive:
 
     def __init__(self):
@@ -14,4 +12,3 @@ class UserArchive:
     def show_users(self):
         for user in self.__private_users:
             print(user.get_name())
-        

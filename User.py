@@ -35,7 +35,7 @@ class User:
         return self.__private_objective
     
     def set_objective(self, objective):
-        self.__private_ojective = objective
+        self.__private_objective = objective
     
     def to_dict(self):
 
@@ -46,7 +46,7 @@ class User:
             "altura": self.get_height(),
             "objetivo": self.get_objective()
         }
-    
+
     @classmethod    # Decorator que faz o método abaixo receber a classe como argumento.
     def from_dict(cls, data): # cls = class, data é um dictionary que como argumento será passado
         return cls(data["nome"], data["idade"], data["peso"], data["altura"], data["objetivo"])

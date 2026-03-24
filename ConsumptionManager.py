@@ -1,3 +1,6 @@
+from time import sleep
+
+
 class ConsumptionManager:
 
     def __init__(self, users, foods):
@@ -10,7 +13,7 @@ class ConsumptionManager:
     def start(self):
         
         while True:  # Checa se usuário existe. Pede um nome de usuário até este ser válido (ter sido registrado anteriormente)
-            print("Usuários: \n")
+            print("\nUsuários: \n")
             for user in self.__private_users:
                 print(user.get_name())
 
@@ -28,9 +31,9 @@ class ConsumptionManager:
             if (self.food_exists(foodName)):
                 self.add_to_consumed_foods(foodName, self.__private_foods)
                 
-            
             else:
-                print(f"{foodName} não cadastrado. Tente novamente.\n")
+                
+                print(f"{foodName} não cadastrado. Tente novamente.\n") # Perguntar pro usuário se ele deseja adicionar o alimento.
                 continue
 
             stopMark = input("Deseja adicionar outro alimento que o usuário consumiu? (Y/N): ").lower()
@@ -38,23 +41,39 @@ class ConsumptionManager:
             if (stopMark == "n"):
                 break
 
-                
         foodToPortions = self.portion_register() 
         
         user = self.get_user(self.__private_users, userName)
         self.show_details(foodToPortions, user) 
 
-
     def show_details(self, foodToPortions, user): # Método que engloba as tarefas de printar todas as informações sobre o usuário em questão.
-        
+        data = []
         user_name = user.get_name()
+        data.append(user_name)
+        
         consumed_calories = 1.0 * self.consumed_calories_total(self.__private_consumedFoods, foodToPortions)
+        data.append(consumed_calories)
+        
         consumed_proteins = self.consumed_proteins_total(self.__private_consumedFoods,foodToPortions)
+        data.append(consumed_proteins)
+
         consumed_carbo = self.consumed_carbo_total(self.__private_consumedFoods, foodToPortions)
+        data.append(consumed_carbo)
+
         consumed_fats = self.consumed_fats_total(self.__private_consumedFoods, foodToPortions)
+        data.append(consumed_fats)
+
         tmb = self.basal_metabolic_rate(user.get_age(), user.get_weight())
+        data.append(tmb)
+
         activity_factor = self.physical_activity_level()
+
         get = self.daily_energy_expenditure(tmb, activity_factor)
+        data.append(get)
+
+        self.daily_register(data)
+
+        self.performance(get, user, consumed_calories)
 
 
         print(f"Informações sobre o usuário \033[92m{user_name}\033[0m:\n")
@@ -67,9 +86,61 @@ class ConsumptionManager:
         print(f"\n{user_name} consumiu um total de {consumed_calories:.2f} calorias.")
         print(f"{user_name} consumiu um total de {consumed_proteins:.2f} g de proteínas.")
         print(f"{user_name} consumiu um total de {consumed_carbo:.2f} g de carboidratos.")
-        print(f"{user_name} consumiu um total de {consumed_fats:.2f} g de gorduras.")
-        
+        print(f"{user_name} consumiu um total de {consumed_fats:.2f} g de gorduras.\n")
 
+        self.performance(get, user, consumed_calories)
+        sleep(5)
+
+        
+    def performance(self, get, user, consumed_calories):
+        objective = user.get_objective()
+        print(f"{user.get_name()} tem o objetivo de " + objective + " massa.")
+
+        if (objective == "ganho"):
+            if (300 <= consumed_calories - get <= 500):
+                print("Seu objetivo é engordar e você está ganhando massa saudavelmente.")
+            else:
+                print(f"{user.get_name()} está falhando miseravelmente.")
+        elif (objective == "perda"):
+            if (300 <= get - consumed_calories <= 500):
+                print("Seu objetivo é emagrecer e você está perdendo massa saudavelmente.")
+            else:
+                print(f"{user.get_name()} está falhando miseravelmente.")
+        elif (objective == "manter"):
+            if ((25 <= get - consumed_calories <= 30) or (25 <= consumed_calories - get <= 30)):
+                print("Seu objetivo é manter o peso e você o está fazendo.")
+            else:
+                print(f"{user.get_name()} está falhando miseravelmente.")
+
+    def daily_register(self, data): # Método que mais tá me dando dor de cabeça. Ideia é que quando chamado, administrador digite a data manualmente 
+        import json
+        date = input("Digite a data (dd/mm/yyyy): ")
+        data.append(date)
+        
+        entry = {
+            "data" : date,
+            "usuario" : data[0],
+            "calorias" : data[1],
+            "proteinas" : data[2],
+            "carboidratos" : data[3],
+            "gorduras" : data[4],
+            "tmb" : data[5],
+            "get" : data[6]
+        }
+            # log é um array onde é mantido cada uma das entries. Uma entry representa o que o usuário comeu no dia.
+            
+        try:
+            with open ("consumption.json", "r") as f:
+                log = json.load(f) # Quando consumption.json já existe.
+        
+        except FileNotFoundError: # Na primeira vez que o app roda, não tem o arquivo consumption ainda, não tem o log em si. Cria-se o log.
+            log = []
+
+        log.append(entry)
+
+        with open("consumption.json", "w") as f:
+            json.dump(log, f, indent=2)
+            
     
     def portion_register(self): # Método p/ associar cada alimento a uma quantidade consumida num hashmap.
         foodToPortions = {}
@@ -119,11 +190,10 @@ class ConsumptionManager:
         return carbo
 
     def food_exists(self, foodName): # Método que checa se o alimento a ser consultado existe no registro. Análogo a user_exists().
-
-
         for food in self.__private_foods:
             if (food.get_name() == foodName):
                 return True
+
         return False
     
     def consumed_calories_total(self, consumedFoods, dictionary_portions):
@@ -169,7 +239,7 @@ class ConsumptionManager:
 
     def physical_activity_level(self):
         
-        print("""\nNível de atividade física do usuário\n:
+        print("""\n    Nível de atividade física do usuário:\n
 1 - Sedentário: trabalho de escritório, pouco movimento.
 2 - Leve: exercício leve 1-3 dias por semana.
 3 - Moderado: exercício moderado 3-5 dias por semana.
