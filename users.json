@@ -1,16 +1,16 @@
 [
   {
     "nome": "Marcos",
-    "idade": 18,
-    "peso": 50.0,
-    "altura": 155.0,
+    "idade": 22,
+    "peso": 55.0,
+    "altura": 190.0,
     "objetivo": "manter"
   },
   {
-    "nome": "Nicolas",
-    "idade": 11,
-    "peso": 50.0,
-    "altura": 165.0,
-    "objetivo": "perda"
+    "nome": "Lucas",
+    "idade": 29,
+    "peso": 88.0,
+    "altura": 193.0,
+    "objetivo": "manter"
   }
 ]

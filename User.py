@@ -47,5 +47,9 @@ class User:
             "objetivo": self.get_objective()
         }
     
-    def from_dict(self):
-        
+    @classmethod    # Decorator que faz o método abaixo receber a classe como argumento.
+    def from_dict(cls, data): # cls = class, data é um dictionary que como argumento será passado
+        return cls(data["nome"], data["idade"], data["peso"], data["altura"], data["objetivo"])
+        # cls(...) usará o construtor da classe passada como parâmetro p/ criar objetos dela, tipo
+        # quando faz user = User(userName, userAge, userWeight, userHeight, userObjective), só que 
+        # é feito sem vc escrever. Retorna o objeto da classe dada como parâmetro

@@ -7,6 +7,22 @@ from FoodArchive import FoodArchive
 from ConsumptionManager import ConsumptionManager
 import json
 
+def save_foods():
+    with open("foods.json", "w") as f:
+        foods_list = []
+        for food in foodArchive.get_foods():
+            foods_list.append(food.to_dict())
+
+        json.dump(foods_list, f, indent=2)
+
+def load_foods():
+    try:
+        with open("foods.json", "r") as f:
+            for data in json.load(f):
+                foodArchive.add(Food.from_dict(data))
+    
+    except FileNotFoundError:
+        pass
 
 def save_users():
     with open("users.json", "w") as f:
@@ -17,10 +33,12 @@ def save_users():
         json.dump(users_list, f, indent=2) # sem o indent = 2, cria um dic do lado do outro :((
 
 def load_users():
-    with open("users.json", "r") as f:
-        for data in json.load(f):
-            userArchive.add()
-    
+    try: # precisa do try porque ao abrir o software pela primeira vez, users.json não existe ainda.
+        with open("users.json", "r") as f:
+            for data in json.load(f):
+                userArchive.add(User.from_dict(data)) # from_dict(cls, data) --> User é cls e data é o dict
+    except FileNotFoundError:
+        pass
 
 def food_register():
     while True:
@@ -91,9 +109,9 @@ def get_command():
 # No momento, software só funciona p/ administrador. (ideia de fazer uma interface p/ usuário checar seu histórico)
 
 
-
 userArchive = UserArchive()
 foodArchive = FoodArchive()
+load_users()
 
 while True:
     command = get_command()

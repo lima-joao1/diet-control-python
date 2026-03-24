@@ -25,3 +25,18 @@ class Food:
 
     def get_fat(self):
         return self.__private_fat
+    
+    def to_dict(self):
+
+        return {
+            "nome" : self.get_name(),
+            "gramas" : self.get_grammes(),
+            "calorias_porção" : self.get_caloriesPerPortion(),
+            "proteínas" : self.get_proteins(),
+            "carboídratos" : self.get_carbo(),
+            "gorduras" : self.get_fat()
+        }
+    
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data["nome"], data["gramas"], data["calorias_porção"], data["proteínas"], data["carboídratos", data["gorduras"]])
