@@ -94,7 +94,7 @@ class ConsumptionManager:
         
     def performance(self, get, user, consumed_calories):
         objective = user.get_objective()
-        print(f"{user.get_name()} tem o objetivo de " + objective + " massa.")
+        print(f"{user.get_name()} tem o objetivo de " + objective + " de massa.")
 
         if (objective == "ganho"):
             if (300 <= consumed_calories - get <= 500):
